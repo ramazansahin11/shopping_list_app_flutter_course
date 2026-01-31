@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shopping_list_app_flutter_course/data/categories.dart';
 import 'package:shopping_list_app_flutter_course/models/category.dart';
+import 'package:shopping_list_app_flutter_course/models/grocery_item.dart';
 
 class NewItem extends StatefulWidget {
   const NewItem({super.key});
@@ -17,6 +18,14 @@ class _NewItemState extends State<NewItem> {
   void _saveItem() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
+      Navigator.of(context).pop(
+        GroceryItem(
+          id: DateTime.now().toString(),
+          name: _enteredName,
+          quantity: _enteredQuantity,
+          category: _selectedCategory,
+        ),
+      );
     }
   }
 
@@ -36,9 +45,9 @@ class _NewItemState extends State<NewItem> {
                 validator: (value) {
                   if (value == null ||
                       value.isEmpty ||
-                      int.tryParse(value) == null ||
-                      int.tryParse(value)! <= 0) {
-                    return 'Must be a valid, positive number.';
+                      value.trim().length <= 1 ||
+                      value.trim().length > 50) {
+                    return 'Must be between 1 and 50 characters.';
                   }
                   return null;
                 },
@@ -71,6 +80,7 @@ class _NewItemState extends State<NewItem> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: DropdownButtonFormField(
+                      onSaved: (newValue) {},
                       initialValue: _selectedCategory,
                       items: [
                         for (final category in categories.entries)
@@ -90,7 +100,9 @@ class _NewItemState extends State<NewItem> {
                           ),
                       ],
                       onChanged: (value) {
-                        _selectedCategory = value!;
+                        setState(() {
+                          _selectedCategory = value!;
+                        });
                       },
                     ),
                   ),
